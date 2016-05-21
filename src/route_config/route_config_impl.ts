@@ -1,8 +1,8 @@
 import {Type} from '../../src/facade/lang';
-import {RouteDefinition} from '../route_definition';
+import {RouteDefinition, Defer} from '../route_definition';
 import {RegexSerializer} from '../rules/route_paths/regex_route_path';
 
-export {RouteDefinition} from '../route_definition';
+export {RouteDefinition, Defer} from '../route_definition';
 
 var __make_dart_analyzer_happy: Promise<any> = null;
 
@@ -24,14 +24,17 @@ export abstract class AbstractRoute implements RouteDefinition {
   regex: string;
   serializer: RegexSerializer;
   data: {[key: string]: any};
+  defer: Defer;
 
-  constructor({name, useAsDefault, path, regex, serializer, data}: RouteDefinition) {
+  constructor({name, useAsDefault, path, regex, serializer, data, defer}: RouteDefinition) {
     this.name = name;
     this.useAsDefault = useAsDefault;
     this.path = path;
     this.regex = regex;
     this.serializer = serializer;
     this.data = data;
+    // It went through the normalizer
+    this.defer = defer;
   }
 }
 
@@ -62,14 +65,15 @@ export class Route extends AbstractRoute {
   component: any;
   aux: string = null;
 
-  constructor({name, useAsDefault, path, regex, serializer, data, component}: RouteDefinition) {
+  constructor({name, useAsDefault, path, regex, serializer, data, component, defer}: RouteDefinition) {
     super({
       name: name,
       useAsDefault: useAsDefault,
       path: path,
       regex: regex,
       serializer: serializer,
-      data: data
+      data: data,
+      defer: defer
     });
     this.component = component;
   }
@@ -99,14 +103,15 @@ export class Route extends AbstractRoute {
 export class AuxRoute extends AbstractRoute {
   component: any;
 
-  constructor({name, useAsDefault, path, regex, serializer, data, component}: RouteDefinition) {
+  constructor({name, useAsDefault, path, regex, serializer, data, component, defer}: RouteDefinition) {
     super({
       name: name,
       useAsDefault: useAsDefault,
       path: path,
       regex: regex,
       serializer: serializer,
-      data: data
+      data: data,
+      defer: defer
     });
     this.component = component;
   }
@@ -141,14 +146,15 @@ export class AsyncRoute extends AbstractRoute {
   loader: () => Promise<Type>;
   aux: string = null;
 
-  constructor({name, useAsDefault, path, regex, serializer, data, loader}: RouteDefinition) {
+  constructor({name, useAsDefault, path, regex, serializer, data, loader, defer}: RouteDefinition) {
     super({
       name: name,
       useAsDefault: useAsDefault,
       path: path,
       regex: regex,
       serializer: serializer,
-      data: data
+      data: data,
+      defer: defer
     });
     this.loader = loader;
   }
@@ -179,14 +185,15 @@ export class AsyncRoute extends AbstractRoute {
 export class Redirect extends AbstractRoute {
   redirectTo: any[];
 
-  constructor({name, useAsDefault, path, regex, serializer, data, redirectTo}: RouteDefinition) {
+  constructor({name, useAsDefault, path, regex, serializer, data, redirectTo, defer}: RouteDefinition) {
     super({
       name: name,
       useAsDefault: useAsDefault,
       path: path,
       regex: regex,
       serializer: serializer,
-      data: data
+      data: data,
+      defer: defer
     });
     this.redirectTo = redirectTo;
   }

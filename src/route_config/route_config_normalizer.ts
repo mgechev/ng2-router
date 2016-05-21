@@ -1,5 +1,5 @@
 import {AsyncRoute, AuxRoute, Route, Redirect, RouteDefinition} from './route_config_decorator';
-import {ComponentDefinition} from '../route_definition';
+import {ComponentDefinition, Defer} from '../route_definition';
 import {isType, Type} from '../../src/facade/lang';
 import {BaseException} from '../../src/facade/exceptions';
 import {RouteRegistry} from '../route_registry';
@@ -14,6 +14,14 @@ import {RouteRegistry} from '../route_registry';
  */
 export function normalizeRouteConfig(config: RouteDefinition,
                                      registry: RouteRegistry): RouteDefinition {
+  if (!config.defer) {
+    config.defer = {
+      resolve: () => Promise.resolve(),
+      deps: []
+    };
+  } else if (!config.defer.deps) {
+    config.defer.deps = [];
+  }
   if (config instanceof AsyncRoute) {
     var wrappedLoader = wrapLoaderToReconfigureRegistry(config.loader, registry);
     return new AsyncRoute({
@@ -21,7 +29,8 @@ export function normalizeRouteConfig(config: RouteDefinition,
       loader: wrappedLoader,
       name: config.name,
       data: config.data,
-      useAsDefault: config.useAsDefault
+      useAsDefault: config.useAsDefault,
+      defer: config.defer
     });
   }
   if (config instanceof Route || config instanceof Redirect || config instanceof AuxRoute) {
@@ -45,7 +54,8 @@ export function normalizeRouteConfig(config: RouteDefinition,
       loader: wrappedLoader,
       name: config.name,
       data: config.data,
-      useAsDefault: config.useAsDefault
+      useAsDefault: config.useAsDefault,
+      defer: config.defer
     });
   }
   if (config.aux) {
@@ -60,7 +70,8 @@ export function normalizeRouteConfig(config: RouteDefinition,
           component:<Type>componentDefinitionObject.constructor,
           name: config.name,
           data: config.data,
-          useAsDefault: config.useAsDefault
+          useAsDefault: config.useAsDefault,
+          defer: config.defer
         });
       } else if (componentDefinitionObject.type == 'loader') {
         return new AsyncRoute({
@@ -68,7 +79,8 @@ export function normalizeRouteConfig(config: RouteDefinition,
           loader: componentDefinitionObject.loader,
           name: config.name,
           data: config.data,
-          useAsDefault: config.useAsDefault
+          useAsDefault: config.useAsDefault,
+          defer: config.defer
         });
       } else {
         throw new BaseException(

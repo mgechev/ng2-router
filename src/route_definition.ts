@@ -24,6 +24,7 @@ export interface RouteDefinition {
   name?: string;
   data?: any;
   useAsDefault?: boolean;
+  defer?: Defer;
 }
 
 /**
@@ -37,3 +38,15 @@ export interface ComponentDefinition {
   loader?: () => Promise<Type>;
   component?: Type;
 }
+
+/**
+ * An object which needs to be resolved until we are able to render the route component.
+ *
+ * @example
+ * const baz: Defer = { resolve: () => Promise.resolve(), deps: [] };
+ */
+export interface Defer {
+  resolve: (...deps: any[]) => Promise<any>;
+  deps?: any[];
+}
+

@@ -1,3 +1,4 @@
+import {OpaqueToken} from '@angular/core';
 import {PromiseWrapper, EventEmitter} from '../../src/facade/async';
 import {StringMapWrapper} from '../../src/facade/collection';
 import {isBlank, isPresent} from '../../src/facade/lang';
@@ -17,6 +18,7 @@ import {ComponentInstruction, RouteParams, RouteData} from '../instruction';
 import * as hookMod from '../lifecycle/lifecycle_annotations';
 import {hasLifecycleHook} from '../lifecycle/route_lifecycle_reflector';
 import {OnActivate, CanReuse, OnReuse, OnDeactivate, CanDeactivate} from '../interfaces';
+import {DEFER} from '../route_registry';
 
 let _resolveToTrue = PromiseWrapper.resolve(true);
 
@@ -56,23 +58,45 @@ export class RouterOutlet implements OnDestroy {
     this._currentInstruction = nextInstruction;
     var componentType = nextInstruction.componentType;
     var childRouter = this._parentRouter.childRouter(componentType);
+    var defer = nextInstruction.defer;
 
-    var providers = ReflectiveInjector.resolve([
+    var DEFER_INIT_TOKEN = new OpaqueToken('DeferInitToken');
+    var commonProviders = [
       provide(RouteData, {useValue: nextInstruction.routeData}),
       provide(RouteParams, {useValue: new RouteParams(nextInstruction.params)}),
-      provide(routerMod.Router, {useValue: childRouter})
-    ]);
-    this._componentRef =
-        this._loader.loadNextToLocation(componentType, this._viewContainerRef, providers);
-    return this._componentRef.then((componentRef) => {
-      this.activateEvents.emit(componentRef.instance);
-      if (hasLifecycleHook(hookMod.routerOnActivate, componentType)) {
-        return this._componentRef.then(
-            (ref: ComponentRef<any>) =>
-                (<OnActivate>ref.instance).routerOnActivate(nextInstruction, previousInstruction));
-      } else {
-        return componentRef;
-      }
+      provide(routerMod.Router, {useValue: childRouter}),
+      provide(DEFER_INIT_TOKEN, {
+        useFactory: function () {
+          return defer.resolve.apply(null, arguments);
+        }, deps: defer.deps
+      })
+    ];
+    var providers = ReflectiveInjector.resolve(commonProviders.concat(
+      provide(DEFER_INIT_TOKEN, {
+        useFactory: function () {
+          return defer.resolve.apply(null, arguments);
+        }, deps: defer.deps
+      })
+    ));
+    var parentInjector = this._viewContainerRef.parentInjector;
+    var injector = ReflectiveInjector.fromResolvedProviders(providers, parentInjector);
+    var deferPromise = injector.get(DEFER_INIT_TOKEN);
+    return deferPromise.then((data) => {
+      var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(
+        provide(DEFER, { useValue: data })
+      ));
+      this._componentRef =
+          this._loader.loadNextToLocation(componentType, this._viewContainerRef, deferResolvedProviders);
+      return this._componentRef.then((componentRef) => {
+        this.activateEvents.emit(componentRef.instance);
+        if (hasLifecycleHook(hookMod.routerOnActivate, componentType)) {
+          return this._componentRef.then(
+              (ref: ComponentRef<any>) =>
+                  (<OnActivate>ref.instance).routerOnActivate(nextInstruction, previousInstruction));
+        } else {
+          return componentRef;
+        }
+      });
     });
   }
 

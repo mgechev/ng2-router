@@ -6,6 +6,7 @@ import {RouteHandler} from './route_handlers/route_handler';
 import {Url, convertUrlParamsToArray} from '../url_parser';
 import {ComponentInstruction} from '../instruction';
 import {RoutePath, GeneratedUrl} from './route_paths/route_path';
+import {Defer} from '../route_definition';
 
 
 // RouteMatch objects hold information about a match between a rule and a URL
@@ -68,7 +69,7 @@ export class RouteRule implements AbstractRule {
   // TODO: cache component instruction instances by params and by ParsedUrl instance
 
   constructor(private _routePath: RoutePath, public handler: RouteHandler,
-              private _routeName: string) {
+              private _routeName: string, private _defer: Defer) {
     this.specificity = this._routePath.specificity;
     this.hash = this._routePath.hash;
     this.terminal = this._routePath.terminal;
@@ -111,7 +112,7 @@ export class RouteRule implements AbstractRule {
     }
     var instruction =
         new ComponentInstruction(urlPath, urlParams, this.handler.data, this.handler.componentType,
-                                 this.terminal, this.specificity, params, this._routeName);
+                                 this.terminal, this.specificity, params, this._routeName, this._defer);
     this._cache.set(hashKey, instruction);
 
     return instruction;

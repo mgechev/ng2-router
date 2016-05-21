@@ -1,6 +1,7 @@
 import {StringMapWrapper} from '../src/facade/collection';
 import {isPresent, isBlank, normalizeBlank} from '../src/facade/lang';
 import {PromiseWrapper} from '../src/facade/async';
+import {Defer} from './route_definition';
 
 
 /**
@@ -311,7 +312,8 @@ export class ComponentInstruction {
    */
   constructor(public urlPath: string, public urlParams: string[], data: RouteData,
               public componentType, public terminal: boolean, public specificity: string,
-              public params: {[key: string]: string} = null, public routeName: string) {
+              public params: {[key: string]: string} = null, public routeName: string,
+              public defer: Defer) {
     this.routeData = isPresent(data) ? data : BLANK_ROUTE_DATA;
   }
 }
