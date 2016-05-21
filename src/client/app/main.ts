@@ -1,7 +1,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { enableProdMode, provide } from '@angular/core';
 import { bootstrap } from '@angular/platform-browser-dynamic';
-import { ROUTER_PROVIDERS } from '@angular/router';
+import { ROUTER_PROVIDERS } from '@angular/router-deprecated';
 
 import { AppComponent } from './app.component';
 
