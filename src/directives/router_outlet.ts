@@ -97,6 +97,8 @@ export class RouterOutlet implements OnDestroy {
           return componentRef;
         }
       });
+    }, (e) => {
+      throw e;
     });
   }
 
