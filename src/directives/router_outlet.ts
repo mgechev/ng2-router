@@ -64,12 +64,7 @@ export class RouterOutlet implements OnDestroy {
     var commonProviders = [
       provide(RouteData, {useValue: nextInstruction.routeData}),
       provide(RouteParams, {useValue: new RouteParams(nextInstruction.params)}),
-      provide(routerMod.Router, {useValue: childRouter}),
-      provide(DEFER_INIT_TOKEN, {
-        useFactory: function () {
-          return defer.resolve.apply(null, arguments);
-        }, deps: defer.deps
-      })
+      provide(routerMod.Router, {useValue: childRouter})
     ];
     var providers = ReflectiveInjector.resolve(commonProviders.concat(
       provide(DEFER_INIT_TOKEN, {
