@@ -18,7 +18,6 @@ import {ComponentInstruction, RouteParams, RouteData} from '../instruction';
 import * as hookMod from '../lifecycle/lifecycle_annotations';
 import {hasLifecycleHook} from '../lifecycle/route_lifecycle_reflector';
 import {OnActivate, CanReuse, OnReuse, OnDeactivate, CanDeactivate} from '../interfaces';
-import {DEFER} from '../route_registry';
 
 let _resolveToTrue = PromiseWrapper.resolve(true);
 
@@ -60,26 +59,30 @@ export class RouterOutlet implements OnDestroy {
     var childRouter = this._parentRouter.childRouter(componentType);
     var defer = nextInstruction.defer;
 
-    var DEFER_INIT_TOKEN = new OpaqueToken('DeferInitToken');
     var commonProviders = [
       provide(RouteData, {useValue: nextInstruction.routeData}),
       provide(RouteParams, {useValue: new RouteParams(nextInstruction.params)}),
       provide(routerMod.Router, {useValue: childRouter})
     ];
-    var providers = ReflectiveInjector.resolve(commonProviders.concat(
-      provide(DEFER_INIT_TOKEN, {
-        useFactory: function () {
-          return defer.resolve.apply(null, arguments);
-        }, deps: defer.deps
-      })
-    ));
+    var tokens = Object.keys(defer);
+    var localProviders = tokens.map((token: string) => {
+      var current = defer[token];
+      return provide(token, {
+        useFactory: current.resolve,
+        deps: current.deps
+      });
+    });
+    var providers = ReflectiveInjector.resolve(commonProviders.concat(localProviders));
     var parentInjector = this._viewContainerRef.parentInjector;
     var injector = ReflectiveInjector.fromResolvedProviders(providers, parentInjector);
-    var deferPromise = injector.get(DEFER_INIT_TOKEN);
-    return deferPromise.then((data) => {
-      var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(
-        provide(DEFER, { useValue: data })
-      ));
+    var deferPromises = tokens.map((token: string) => injector.get(token));
+    return Promise.all(deferPromises).then((data: any[]) => {
+      localProviders = tokens.map((token: string, idx: number) => {
+        return provide(token, {
+          useValue: data[idx]
+        });
+      });
+      var deferResolvedProviders = ReflectiveInjector.resolve(commonProviders.concat(localProviders));
       this._componentRef =
           this._loader.loadNextToLocation(componentType, this._viewContainerRef, deferResolvedProviders);
       return this._componentRef.then((componentRef) => {

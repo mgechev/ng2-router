@@ -15,12 +15,7 @@ import {RouteRegistry} from '../route_registry';
 export function normalizeRouteConfig(config: RouteDefinition,
                                      registry: RouteRegistry): RouteDefinition {
   if (!config.defer) {
-    config.defer = {
-      resolve: () => Promise.resolve(),
-      deps: []
-    };
-  } else if (!config.defer.deps) {
-    config.defer.deps = [];
+    config.defer = {};
   }
   if (config instanceof AsyncRoute) {
     var wrappedLoader = wrapLoaderToReconfigureRegistry(config.loader, registry);

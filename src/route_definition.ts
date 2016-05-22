@@ -39,13 +39,17 @@ export interface ComponentDefinition {
   component?: Type;
 }
 
+export interface Defer {
+  [key: string]: DeferredFactory;
+}
+
 /**
  * An object which needs to be resolved until we are able to render the route component.
  *
  * @example
- * const baz: Defer = { resolve: () => Promise.resolve(), deps: [] };
+ * const baz: DeferredFactory = { resolve: () => Promise.resolve(), deps: [] };
  */
-export interface Defer {
+export interface DeferredFactory {
   resolve: (...deps: any[]) => Promise<any>;
   deps?: any[];
 }
