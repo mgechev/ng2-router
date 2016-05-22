@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { DEFER } from '@angular/router-deprecated';
 
 /**
  * This class represents the lazy loaded AboutComponent.
@@ -11,7 +10,7 @@ import { DEFER } from '@angular/router-deprecated';
   styleUrls: ['about.component.css']
 })
 export class AboutComponent {
-  constructor(@Inject(DEFER) name: any) {
+  constructor(@Inject('name') name: any) {
     console.log(name);
   }
 }

@@ -28,12 +28,14 @@ import { NameListService, NavbarComponent, ToolbarComponent } from './shared/ind
     name: 'About',
     component: AboutComponent,
     defer: {
-      resolve: (params: RouteParams) => {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => resolve(params.get('name')), 2000);
-        });
-      },
-      deps: [RouteParams]
+      name: {
+        resolve: (params: RouteParams) => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => resolve(params.get('name')), 2000);
+          });
+        },
+        deps: [RouteParams]
+      }
     }
   }
 ])
