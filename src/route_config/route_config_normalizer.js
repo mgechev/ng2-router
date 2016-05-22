@@ -13,6 +13,12 @@ function normalizeRouteConfig(config, registry) {
     if (!config.defer) {
         config.defer = {};
     }
+    else {
+        Object.keys(config.defer).forEach(function (key) {
+            var d = config.defer[key];
+            d.deps = d.deps || [];
+        });
+    }
     if (config instanceof route_config_decorator_1.AsyncRoute) {
         var wrappedLoader = wrapLoaderToReconfigureRegistry(config.loader, registry);
         return new route_config_decorator_1.AsyncRoute({
