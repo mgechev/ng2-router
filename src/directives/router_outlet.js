@@ -11,16 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var core_1 = require('@angular/core');
 var async_1 = require('../../src/facade/async');
 var collection_1 = require('../../src/facade/collection');
 var lang_1 = require('../../src/facade/lang');
-var core_2 = require('@angular/core');
+var core_1 = require('@angular/core');
 var routerMod = require('../router');
 var instruction_1 = require('../instruction');
 var hookMod = require('../lifecycle/lifecycle_annotations');
 var route_lifecycle_reflector_1 = require('../lifecycle/route_lifecycle_reflector');
-var route_registry_1 = require('../route_registry');
 var _resolveToTrue = async_1.PromiseWrapper.resolve(true);
 /**
  * A router outlet is a placeholder that Angular dynamically fills based on the application's route.
@@ -59,22 +57,30 @@ var RouterOutlet = (function () {
         var componentType = nextInstruction.componentType;
         var childRouter = this._parentRouter.childRouter(componentType);
         var defer = nextInstruction.defer;
-        var DEFER_INIT_TOKEN = new core_1.OpaqueToken('DeferInitToken');
         var commonProviders = [
-            core_2.provide(instruction_1.RouteData, { useValue: nextInstruction.routeData }),
-            core_2.provide(instruction_1.RouteParams, { useValue: new instruction_1.RouteParams(nextInstruction.params) }),
-            core_2.provide(routerMod.Router, { useValue: childRouter })
+            core_1.provide(instruction_1.RouteData, { useValue: nextInstruction.routeData }),
+            core_1.provide(instruction_1.RouteParams, { useValue: new instruction_1.RouteParams(nextInstruction.params) }),
+            core_1.provide(routerMod.Router, { useValue: childRouter })
         ];
-        var providers = core_2.ReflectiveInjector.resolve(commonProviders.concat(core_2.provide(DEFER_INIT_TOKEN, {
-            useFactory: function () {
-                return defer.resolve.apply(null, arguments);
-            }, deps: defer.deps
-        })));
+        var tokens = Object.keys(defer);
+        var localProviders = tokens.map(function (token) {
+            var current = defer[token];
+            return core_1.provide(token, {
+                useFactory: current.resolve,
+                deps: current.deps
+            });
+        });
+        var providers = core_1.ReflectiveInjector.resolve(commonProviders.concat(localProviders));
         var parentInjector = this._viewContainerRef.parentInjector;
-        var injector = core_2.ReflectiveInjector.fromResolvedProviders(providers, parentInjector);
-        var deferPromise = injector.get(DEFER_INIT_TOKEN);
-        return deferPromise.then(function (data) {
-            var deferResolvedProviders = core_2.ReflectiveInjector.resolve(commonProviders.concat(core_2.provide(route_registry_1.DEFER, { useValue: data })));
+        var injector = core_1.ReflectiveInjector.fromResolvedProviders(providers, parentInjector);
+        var deferPromises = tokens.map(function (token) { return injector.get(token); });
+        return Promise.all(deferPromises).then(function (data) {
+            localProviders = tokens.map(function (token, idx) {
+                return core_1.provide(token, {
+                    useValue: data[idx]
+                });
+            });
+            var deferResolvedProviders = core_1.ReflectiveInjector.resolve(commonProviders.concat(localProviders));
             _this._componentRef =
                 _this._loader.loadNextToLocation(componentType, _this._viewContainerRef, deferResolvedProviders);
             return _this._componentRef.then(function (componentRef) {
@@ -190,13 +196,13 @@ var RouterOutlet = (function () {
     };
     RouterOutlet.prototype.ngOnDestroy = function () { this._parentRouter.unregisterPrimaryOutlet(this); };
     __decorate([
-        core_2.Output('activate'), 
+        core_1.Output('activate'), 
         __metadata('design:type', Object)
     ], RouterOutlet.prototype, "activateEvents", void 0);
     RouterOutlet = __decorate([
-        core_2.Directive({ selector: 'router-outlet' }),
-        __param(3, core_2.Attribute('name')), 
-        __metadata('design:paramtypes', [core_2.ViewContainerRef, core_2.DynamicComponentLoader, routerMod.Router, String])
+        core_1.Directive({ selector: 'router-outlet' }),
+        __param(3, core_1.Attribute('name')), 
+        __metadata('design:paramtypes', [core_1.ViewContainerRef, core_1.DynamicComponentLoader, routerMod.Router, String])
     ], RouterOutlet);
     return RouterOutlet;
 }());

@@ -29,39 +29,6 @@ import { Instruction } from './instruction';
  */
 export declare const ROUTER_PRIMARY_COMPONENT: OpaqueToken;
 /**
- * Token used for injection of the resolved deferred data.
- *
- * ### Example
- *
- * ```typescript
- * import {Component} from '@angular/core';
- * import {RouteConfig} from '@angular/router-deprecated';
- *
- * @Component({
- *   selector: 'app-cmp',
- *   template: '...'
- * })
- * @RouteConfig([{
- *   name: 'Home',
- *   component: HomeComponent,
- *   path: '/home',
- *   defer: {
- *     resolve: () => Promise.resolve(42)
- *   }
- * }])
- * class AppComponent{}
- *
- * @Component({
- *   selector: 'app-home'
- *   template: '...'
- * })
- * class HomeComponent {
- *   constructor(private @Inject(DEFER) answer: number) {}
- * }
- * ```
- */
-export declare const DEFER: OpaqueToken;
-/**
  * The RouteRegistry holds route configurations for each component in an Angular app.
  * It is responsible for creating Instructions from URLs, and generating URLs based on route and
  * parameters.

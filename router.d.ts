@@ -3,7 +3,6 @@
  * @description
  * Maps application URLs into application states, to support deep-linking and navigation.
  */
-export { DEFER } from './src/route_registry';
 export { Router, RootRouter } from './src/router';
 export { RouterOutlet } from './src/directives/router_outlet';
 export { RouterLink } from './src/directives/router_link';

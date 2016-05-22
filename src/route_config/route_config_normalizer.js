@@ -11,13 +11,7 @@ var exceptions_1 = require('../../src/facade/exceptions');
  */
 function normalizeRouteConfig(config, registry) {
     if (!config.defer) {
-        config.defer = {
-            resolve: function () { return Promise.resolve(); },
-            deps: []
-        };
-    }
-    else if (!config.defer.deps) {
-        config.defer.deps = [];
+        config.defer = {};
     }
     if (config instanceof route_config_decorator_1.AsyncRoute) {
         var wrappedLoader = wrapLoaderToReconfigureRegistry(config.loader, registry);
