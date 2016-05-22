@@ -16,6 +16,11 @@ export function normalizeRouteConfig(config: RouteDefinition,
                                      registry: RouteRegistry): RouteDefinition {
   if (!config.defer) {
     config.defer = {};
+  } else {
+    Object.keys(config.defer).forEach(key => {
+      let d = config.defer[key];
+      d.deps = d.deps || [];
+    });
   }
   if (config instanceof AsyncRoute) {
     var wrappedLoader = wrapLoaderToReconfigureRegistry(config.loader, registry);
