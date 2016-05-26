@@ -94,8 +94,6 @@ var RouterOutlet = (function () {
                     return componentRef;
                 }
             });
-        }, function (e) {
-            throw e;
         });
     };
     /**
