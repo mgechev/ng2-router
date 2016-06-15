@@ -95,6 +95,8 @@ export class RouterOutlet implements OnDestroy {
           return componentRef;
         }
       });
+    }, (e: any) => {
+      console.error(e);
     });
   }
 
