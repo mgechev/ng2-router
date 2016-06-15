@@ -38,7 +38,7 @@ export declare class RouterLink {
     private _navigationInstruction;
     constructor(_router: Router, _location: Location);
     private _updateLink();
-    isRouteActive: boolean;
+    readonly isRouteActive: boolean;
     routeParams: any[];
     onClick(): boolean;
 }

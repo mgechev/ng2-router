@@ -120,9 +120,9 @@ export declare abstract class Instruction {
     constructor(component: ComponentInstruction, child: Instruction, auxInstruction: {
         [key: string]: Instruction;
     });
-    urlPath: string;
-    urlParams: string[];
-    specificity: string;
+    readonly urlPath: string;
+    readonly urlParams: string[];
+    readonly specificity: string;
     abstract resolveComponent(): Promise<ComponentInstruction>;
     /**
      * converts the instruction into a URL string
@@ -164,8 +164,8 @@ export declare class UnresolvedInstruction extends Instruction {
     private _urlPath;
     private _urlParams;
     constructor(_resolver: () => Promise<Instruction>, _urlPath?: string, _urlParams?: string[]);
-    urlPath: string;
-    urlParams: string[];
+    readonly urlPath: string;
+    readonly urlParams: string[];
     resolveComponent(): Promise<ComponentInstruction>;
 }
 export declare class RedirectInstruction extends ResolvedInstruction {
@@ -173,7 +173,7 @@ export declare class RedirectInstruction extends ResolvedInstruction {
     constructor(component: ComponentInstruction, child: Instruction, auxInstruction: {
         [key: string]: Instruction;
     }, _specificity: string);
-    specificity: string;
+    readonly specificity: string;
 }
 /**
  * A `ComponentInstruction` represents the route state for a single component.

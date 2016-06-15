@@ -25,7 +25,7 @@ export declare class Router {
     registry: RouteRegistry;
     parent: Router;
     hostComponent: any;
-    root: Router;
+    root?: Router;
     navigating: boolean;
     lastNavigationAttempt: string;
     /**
