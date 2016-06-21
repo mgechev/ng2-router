@@ -7,7 +7,7 @@
   "author": "angular",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig-es5.json && cp ./src/package.json dist"
+    "build": "rm -rf dist && tsc --project tsconfig-es2015.json && cp ./src/package.json dist"
   },
   "peerDependencies": {
     "@angular/core": ">=2.0.0-rc.1",
