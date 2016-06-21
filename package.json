@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "",
   "main": "dist/index.js",
-  "jsnext": "esm/index.js",
+  "jsnext:main": "esm/index.js",
   "typins": "index.d.ts",
   "author": "angular",
   "license": "MIT",
